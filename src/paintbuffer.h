@@ -50,6 +50,7 @@ public:
   virtual QCPPainter *startPainting() = 0;
   virtual void donePainting() {}
   virtual void draw(QCPPainter *painter) const = 0;
+  virtual void draw(QPainter *painter) const = 0;
   virtual void clear(const QColor &color) = 0;
   
 protected:
@@ -74,6 +75,7 @@ public:
   // reimplemented virtual methods:
   virtual QCPPainter *startPainting() Q_DECL_OVERRIDE;
   virtual void draw(QCPPainter *painter) const Q_DECL_OVERRIDE;
+  virtual void draw(QPainter *painter) const Q_DECL_OVERRIDE;
   void clear(const QColor &color) Q_DECL_OVERRIDE;
   
 protected:
@@ -119,6 +121,7 @@ public:
   virtual QCPPainter *startPainting() Q_DECL_OVERRIDE;
   virtual void donePainting() Q_DECL_OVERRIDE;
   virtual void draw(QCPPainter *painter) const Q_DECL_OVERRIDE;
+  virtual void draw(QPainter *painter) const Q_DECL_OVERRIDE;
   void clear(const QColor &color) Q_DECL_OVERRIDE;
   
 protected:

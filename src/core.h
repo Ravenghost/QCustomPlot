@@ -40,7 +40,7 @@ class QCPLegend;
 class QCPAbstractLegendItem;
 class QCPSelectionRect;
 
-class QCP_LIB_DECL QCustomPlot : public QWidget
+class QCP_LIB_DECL QCustomPlot : public QQuickPaintedItem
 {
   Q_OBJECT
   /// \cond INCLUDE_QPROPERTIES
@@ -78,7 +78,7 @@ public:
                        };
   Q_ENUMS(RefreshPriority)
   
-  explicit QCustomPlot(QWidget *parent = 0);
+  explicit QCustomPlot(QQuickItem *parent = 0);
   virtual ~QCustomPlot();
   
   // getters:
@@ -99,6 +99,11 @@ public:
   QCP::SelectionRectMode selectionRectMode() const { return mSelectionRectMode; }
   QCPSelectionRect *selectionRect() const { return mSelectionRect; }
   bool openGl() const { return mOpenGl; }
+  // Custom
+  QLocale locale() const { return mLocale; }
+  int devicePixelRatio() const { return 1; } //QScreen pixel ratio
+  QFont font() const { return mFont; }
+  QRect rect() const { return QRect(0, 0, width(), height()); }
   
   // setters:
   void setViewport(const QRect &rect);
@@ -123,6 +128,9 @@ public:
   void setSelectionRectMode(QCP::SelectionRectMode mode);
   void setSelectionRect(QCPSelectionRect *selectionRect);
   void setOpenGl(bool enabled, int multisampling=16);
+  // Custom
+  void setLocale(const QLocale &locale) { mLocale = locale; }
+  void setFont(const QFont &font) { mFont = font; }
   
   // non-property methods:
   // plottable interface:
@@ -191,7 +199,7 @@ public:
   
   QCPAxis *xAxis, *yAxis, *xAxis2, *yAxis2;
   QCPLegend *legend;
-  
+
 signals:
   void mouseDoubleClick(QMouseEvent *event);
   void mousePress(QMouseEvent *event);
@@ -237,6 +245,9 @@ protected:
   QCP::SelectionRectMode mSelectionRectMode;
   QCPSelectionRect *mSelectionRect;
   bool mOpenGl;
+  //Custom
+  QLocale mLocale;
+  QFont mFont;
   
   // non-property members:
   QList<QSharedPointer<QCPAbstractPaintBuffer> > mPaintBuffers;
@@ -256,10 +267,10 @@ protected:
 #endif
   
   // reimplemented virtual methods:
-  virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-  virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-  virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-  virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+  virtual QSize minimumSizeHint() const;
+  virtual QSize sizeHint() const;
+  virtual void paint(QPainter *painter) Q_DECL_FINAL;
+  virtual void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) Q_DECL_OVERRIDE;
   virtual void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
   virtual void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
   virtual void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -283,6 +294,7 @@ protected:
   QCPLayerable *layerableAt(const QPointF &pos, bool onlySelectable, QVariant *selectionDetails=0) const;
   QList<QCPLayerable*> layerableListAt(const QPointF &pos, bool onlySelectable, QList<QVariant> *selectionDetails=0) const;
   void drawBackground(QCPPainter *painter);
+  void drawBackground(QPainter *painter);
   void setupPaintBuffers();
   QCPAbstractPaintBuffer *createPaintBuffer();
   bool hasInvalidatedPaintBuffers();

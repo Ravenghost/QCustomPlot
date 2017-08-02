@@ -343,8 +343,8 @@
 /*!
   Constructs a QCustomPlot and sets reasonable default values.
 */
-QCustomPlot::QCustomPlot(QWidget *parent) :
-  QWidget(parent),
+QCustomPlot::QCustomPlot(QQuickItem *parent) :
+  QQuickPaintedItem(parent),
   xAxis(0),
   yAxis(0),
   xAxis2(0),
@@ -367,6 +367,8 @@ QCustomPlot::QCustomPlot(QWidget *parent) :
   mSelectionRectMode(QCP::srmNone),
   mSelectionRect(0),
   mOpenGl(false),
+  mLocale(QLocale::system()),
+  mFont(QGuiApplication::font()),
   mMouseHasMoved(false),
   mMouseEventLayerable(0),
   mReplotting(false),
@@ -375,17 +377,13 @@ QCustomPlot::QCustomPlot(QWidget *parent) :
   mOpenGlAntialiasedElementsBackup(QCP::aeNone),
   mOpenGlCacheLabelsBackup(true)
 {
-  setAttribute(Qt::WA_NoMousePropagation);
-  setAttribute(Qt::WA_OpaquePaintEvent);
-  setFocusPolicy(Qt::ClickFocus);
-  setMouseTracking(true);
   QLocale currentLocale = locale();
   currentLocale.setNumberOptions(QLocale::OmitGroupSeparator);
   setLocale(currentLocale);
 #ifdef QCP_DEVICEPIXELRATIO_SUPPORTED
-  setBufferDevicePixelRatio(QWidget::devicePixelRatio());
+  setBufferDevicePixelRatio(devicePixelRatio());
 #endif
-  
+
   mOpenGlAntialiasedElementsBackup = mAntialiasedElements;
   mOpenGlCacheLabelsBackup = mPlottingHints.testFlag(QCP::phCacheLabels);
   // create initial layers:
@@ -429,7 +427,7 @@ QCustomPlot::QCustomPlot(QWidget *parent) :
   // create selection rect instance:
   mSelectionRect = new QCPSelectionRect(this);
   mSelectionRect->setLayer(QLatin1String("overlay"));
-  
+
   setViewport(rect()); // needs to be called after mPlotLayout has been created
   
   replot(rpQueuedReplot);
@@ -859,7 +857,13 @@ void QCustomPlot::setOpenGl(bool enabled, int multisampling)
 */
 void QCustomPlot::setViewport(const QRect &rect)
 {
-  mViewport = rect;
+  QRect localRect = rect;
+  if (localRect.height() == 0)
+      localRect.setHeight(100);
+  if (localRect.width() == 0)
+      localRect.setWidth(100);
+
+  mViewport = localRect;
   if (mPlotLayout)
     mPlotLayout->setOuterRect(mViewport);
 }
@@ -1907,11 +1911,8 @@ void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
     layer->drawToPaintBuffer();
   for (int i=0; i<mPaintBuffers.size(); ++i)
     mPaintBuffers.at(i)->setInvalidated(false);
-  
-  if ((refreshPriority == rpRefreshHint && mPlottingHints.testFlag(QCP::phImmediateRefresh)) || refreshPriority==rpImmediateRefresh)
-    repaint();
-  else
-    update();
+
+  update();
   
   emit afterReplot();
   mReplotting = false;
@@ -2204,32 +2205,32 @@ QSize QCustomPlot::sizeHint() const
   Event handler for when the QCustomPlot widget needs repainting. This does not cause a \ref replot, but
   draws the internal buffer on the widget surface.
 */
-void QCustomPlot::paintEvent(QPaintEvent *event)
+void QCustomPlot::paint(QPainter *painter)
 {
-  Q_UNUSED(event);
-  QCPPainter painter(this);
-  if (painter.isActive())
-  {
-    painter.setRenderHint(QPainter::HighQualityAntialiasing); // to make Antialiasing look good if using the OpenGL graphicssystem
-    if (mBackgroundBrush.style() != Qt::NoBrush)
-      painter.fillRect(mViewport, mBackgroundBrush);
-    drawBackground(&painter);
-    for (int bufferIndex = 0; bufferIndex < mPaintBuffers.size(); ++bufferIndex)
-      mPaintBuffers.at(bufferIndex)->draw(&painter);
-  }
+    if (painter->isActive())
+    {
+        painter->setRenderHint(QPainter::HighQualityAntialiasing); // to make Antialiasing look good if using the OpenGL graphicssystem
+        if (mBackgroundBrush.style() != Qt::NoBrush)
+            painter->fillRect(mViewport, mBackgroundBrush);
+        drawBackground(painter);
+        for (int bufferIndex = 0; bufferIndex < mPaintBuffers.size(); ++bufferIndex)
+          mPaintBuffers.at(bufferIndex)->draw(painter);
+    }
 }
+
 
 /*! \internal
   
   Event handler for a resize of the QCustomPlot widget. The viewport (which becomes the outer rect
   of mPlotLayout) is resized appropriately. Finally a \ref replot is performed.
 */
-void QCustomPlot::resizeEvent(QResizeEvent *event)
+void QCustomPlot::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
-  Q_UNUSED(event)
-  // resize and repaint the buffer:
-  setViewport(rect());
-  replot(rpQueuedRefresh); // queued refresh is important here, to prevent painting issues in some contexts (e.g. MDI subwindow)
+    Q_UNUSED(newGeometry)
+    Q_UNUSED(oldGeometry)
+    // resize and repaint the buffer:
+    setViewport(rect());
+    replot(rpQueuedRefresh); // queued refresh is important here, to prevent painting issues in some contexts (e.g. MDI subwindow)
 }
 
 /*! \internal
@@ -2501,6 +2502,28 @@ void QCustomPlot::updateLayout()
   \see setBackground, setBackgroundScaled, setBackgroundScaledMode
 */
 void QCustomPlot::drawBackground(QCPPainter *painter)
+{
+  // Note: background color is handled in individual replot/save functions
+
+  // draw background pixmap (on top of fill, if brush specified):
+  if (!mBackgroundPixmap.isNull())
+  {
+    if (mBackgroundScaled)
+    {
+      // check whether mScaledBackground needs to be updated:
+      QSize scaledSize(mBackgroundPixmap.size());
+      scaledSize.scale(mViewport.size(), mBackgroundScaledMode);
+      if (mScaledBackgroundPixmap.size() != scaledSize)
+        mScaledBackgroundPixmap = mBackgroundPixmap.scaled(mViewport.size(), mBackgroundScaledMode, Qt::SmoothTransformation);
+      painter->drawPixmap(mViewport.topLeft(), mScaledBackgroundPixmap, QRect(0, 0, mViewport.width(), mViewport.height()) & mScaledBackgroundPixmap.rect());
+    } else
+    {
+      painter->drawPixmap(mViewport.topLeft(), mBackgroundPixmap, QRect(0, 0, mViewport.width(), mViewport.height()));
+    }
+  }
+}
+
+void QCustomPlot::drawBackground(QPainter *painter)
 {
   // Note: background color is handled in individual replot/save functions
 

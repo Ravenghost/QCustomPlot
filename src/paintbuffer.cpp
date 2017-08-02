@@ -228,6 +228,15 @@ void QCPPaintBufferPixmap::draw(QCPPainter *painter) const
 }
 
 /* inherits documentation from base class */
+void QCPPaintBufferPixmap::draw(QPainter *painter) const
+{
+  if (painter && painter->isActive())
+    painter->drawPixmap(0, 0, mBuffer);
+  else
+    qDebug() << Q_FUNC_INFO << "invalid or inactive painter passed";
+}
+
+/* inherits documentation from base class */
 void QCPPaintBufferPixmap::clear(const QColor &color)
 {
   mBuffer.fill(color);
@@ -436,6 +445,21 @@ void QCPPaintBufferGlFbo::draw(QCPPainter *painter) const
   painter->drawImage(0, 0, mGlFrameBuffer->toImage());
 }
 
+/* inherits documentation from base class */
+void QCPPaintBufferGlFbo::draw(QPainter *painter) const
+{
+  if (!painter || !painter->isActive())
+  {
+    qDebug() << Q_FUNC_INFO << "invalid or inactive painter passed";
+    return;
+  }
+  if (!mGlFrameBuffer)
+  {
+    qDebug() << Q_FUNC_INFO << "OpenGL frame buffer object doesn't exist, reallocateBuffer was not called?";
+    return;
+  }
+  painter->drawImage(0, 0, mGlFrameBuffer->toImage());
+}
 /* inherits documentation from base class */
 void QCPPaintBufferGlFbo::clear(const QColor &color)
 {
