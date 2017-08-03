@@ -873,5 +873,18 @@ void QCPLayerable::mouseDoubleClickEvent(QMouseEvent *event, const QVariant &det
 */
 void QCPLayerable::wheelEvent(QWheelEvent *event)
 {
-  event->ignore();
+    event->ignore();
+}
+
+void QCPLayerable::touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details)
+{
+    Q_UNUSED(details)
+    Q_UNUSED(pos)
+    event->ignore();
+}
+
+void QCPLayerable::touchReleaseEvent(const QPoint &pos, const QPointF &startPos)
+{
+    Q_UNUSED(pos)
+    Q_UNUSED(startPos)
 }

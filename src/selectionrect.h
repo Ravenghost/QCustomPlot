@@ -55,9 +55,11 @@ public:
   
 signals:
   void started(QMouseEvent *event);
+  void started(const QPoint &pos);
   void changed(const QRect &rect, QMouseEvent *event);
   void canceled(const QRect &rect, QInputEvent *event);
   void accepted(const QRect &rect, QMouseEvent *event);
+  void accepted(const QRect &rect, const QPoint &pos);
   
 protected:
   // property members:
@@ -71,7 +73,9 @@ protected:
   virtual void startSelection(QMouseEvent *event);
   virtual void moveSelection(QMouseEvent *event);
   virtual void endSelection(QMouseEvent *event);
+  virtual void endSelection(const QPoint &pos);
   virtual void keyPressEvent(QKeyEvent *event);
+  virtual void startSelection(const QPoint &pos);
   
   // reimplemented virtual methods
   virtual void applyDefaultAntialiasingHint(QCPPainter *painter) const Q_DECL_OVERRIDE;

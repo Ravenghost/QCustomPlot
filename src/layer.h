@@ -28,6 +28,7 @@
 
 #include "global.h"
 #include "paintbuffer.h"
+#include "customevent.h"
 
 class QCPPainter;
 class QCustomPlot;
@@ -163,6 +164,8 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos);
   virtual void mouseDoubleClickEvent(QMouseEvent *event, const QVariant &details);
   virtual void wheelEvent(QWheelEvent *event);
+  virtual void touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details);
+  virtual void touchReleaseEvent(const QPoint &pos, const QPointF &startPos);
   
   // non-property methods:
   void initializeParentPlot(QCustomPlot *parentPlot);

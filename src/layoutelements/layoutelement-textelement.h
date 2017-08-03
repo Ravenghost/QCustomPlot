@@ -77,11 +77,14 @@ public:
   virtual void mousePressEvent(QMouseEvent *event, const QVariant &details) Q_DECL_OVERRIDE;
   virtual void mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos) Q_DECL_OVERRIDE;
   virtual void mouseDoubleClickEvent(QMouseEvent *event, const QVariant &details) Q_DECL_OVERRIDE;
+  virtual void touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details) Q_DECL_OVERRIDE;
+  virtual void touchReleaseEvent(const QPoint &pos, const QPointF &startPos) Q_DECL_OVERRIDE;
   
 signals:
   void selectionChanged(bool selected);
   void selectableChanged(bool selectable);
   void clicked(QMouseEvent *event);
+  void touched(const QPoint &pos);
   void doubleClicked(QMouseEvent *event);
   
 protected:

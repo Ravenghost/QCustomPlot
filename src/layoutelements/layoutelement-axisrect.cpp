@@ -1302,6 +1302,45 @@ void QCPAxisRect::wheelEvent(QWheelEvent *event)
   }
 }
 
+void QCPAxisRect::touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details)
+{
+    Q_UNUSED(event)
+    Q_UNUSED(details)
+    mTouchDragStart = pos; // need this even when not LeftButton is pressed, to determine in releaseEvent whether it was a full click (no position change between press and release)
+//    if (event->buttons() & Qt::LeftButton)
+//    {
+      mDragging = true;
+      // initialize antialiasing backup in case we start dragging:
+      if (mParentPlot->noAntialiasingOnDrag())
+      {
+        mAADragBackup = mParentPlot->antialiasedElements();
+        mNotAADragBackup = mParentPlot->notAntialiasedElements();
+      }
+      // Mouse range dragging interaction:
+      if (mParentPlot->interactions().testFlag(QCP::iRangeDrag))
+      {
+        mDragStartHorzRange.clear();
+        for (int i=0; i<mRangeDragHorzAxis.size(); ++i)
+          mDragStartHorzRange.append(mRangeDragHorzAxis.at(i).isNull() ? QCPRange() : mRangeDragHorzAxis.at(i)->range());
+        mDragStartVertRange.clear();
+        for (int i=0; i<mRangeDragVertAxis.size(); ++i)
+          mDragStartVertRange.append(mRangeDragVertAxis.at(i).isNull() ? QCPRange() : mRangeDragVertAxis.at(i)->range());
+      }
+      //    }
+}
+
+void QCPAxisRect::touchReleaseEvent(const QPoint &pos, const QPointF &startPos)
+{
+    Q_UNUSED(pos)
+    Q_UNUSED(startPos)
+    mDragging = false;
+    if (mParentPlot->noAntialiasingOnDrag())
+    {
+      mParentPlot->setAntialiasedElements(mAADragBackup);
+      mParentPlot->setNotAntialiasedElements(mNotAADragBackup);
+    }
+}
+
 
 
 

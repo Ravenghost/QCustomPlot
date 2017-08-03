@@ -404,7 +404,20 @@ void QCPTextElement::mouseReleaseEvent(QMouseEvent *event, const QPointF &startP
 void QCPTextElement::mouseDoubleClickEvent(QMouseEvent *event, const QVariant &details)
 {
   Q_UNUSED(details)
-  emit doubleClicked(event);
+    emit doubleClicked(event);
+}
+
+void QCPTextElement::touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details)
+{
+    Q_UNUSED(details)
+    Q_UNUSED(pos)
+    event->accept();
+}
+
+void QCPTextElement::touchReleaseEvent(const QPoint &pos, const QPointF &startPos)
+{
+    if (QPointF(pos - startPos).manhattanLength() <= 3)
+      emit touched(pos);
 }
 
 /*! \internal

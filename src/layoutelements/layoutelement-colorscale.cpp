@@ -518,6 +518,26 @@ void QCPColorScale::wheelEvent(QWheelEvent *event)
   mAxisRect.data()->wheelEvent(event);
 }
 
+void QCPColorScale::touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details)
+{
+    if (!mAxisRect)
+    {
+      qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
+      return;
+    }
+    mAxisRect.data()->touchPressEvent(event, pos, details);
+}
+
+void QCPColorScale::touchReleaseEvent(const QPoint &pos, const QPointF &startPos)
+{
+    if (!mAxisRect)
+    {
+      qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
+      return;
+    }
+    mAxisRect.data()->touchReleaseEvent(pos, startPos);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPColorScaleAxisRectPrivate
 ////////////////////////////////////////////////////////////////////////////////////////////////////

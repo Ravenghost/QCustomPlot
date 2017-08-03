@@ -74,7 +74,8 @@ HEADERS += \
     selectionrect.h \
     plottable1d.h \
     scatterstyle.h \
-    selectiondecorator-bracket.h
+    selectiondecorator-bracket.h \
+    customevent.h
 
 SOURCES += \
     painter.cpp \
