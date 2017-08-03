@@ -99,7 +99,6 @@ public:
   QCP::SelectionRectMode selectionRectMode() const { return mSelectionRectMode; }
   QCPSelectionRect *selectionRect() const { return mSelectionRect; }
   bool openGl() const { return mOpenGl; }
-  // Custom
   QLocale locale() const { return mLocale; }
   int devicePixelRatio() const { return 1; } //QScreen pixel ratio
   QFont font() const { return mFont; }
@@ -128,7 +127,6 @@ public:
   void setSelectionRectMode(QCP::SelectionRectMode mode);
   void setSelectionRect(QCPSelectionRect *selectionRect);
   void setOpenGl(bool enabled, int multisampling=16);
-  // Custom
   void setLocale(const QLocale &locale) { mLocale = locale; }
   void setFont(const QFont &font) { mFont = font; }
   
@@ -245,7 +243,6 @@ protected:
   QCP::SelectionRectMode mSelectionRectMode;
   QCPSelectionRect *mSelectionRect;
   bool mOpenGl;
-  //Custom
   QLocale mLocale;
   QFont mFont;
   
