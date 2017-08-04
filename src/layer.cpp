@@ -783,7 +783,14 @@ void QCPLayerable::deselectEvent(bool *selectionStateChanged)
 void QCPLayerable::mousePressEvent(QMouseEvent *event, const QVariant &details)
 {
   Q_UNUSED(details)
-  event->ignore();
+    event->ignore();
+}
+
+void QCPLayerable::mousePressEvent(bool &event, const QPoint &pos, const QVariant &details)
+{
+  Q_UNUSED(details)
+  Q_UNUSED(pos)
+    event = false;
 }
 
 /*!
@@ -801,7 +808,13 @@ void QCPLayerable::mousePressEvent(QMouseEvent *event, const QVariant &details)
 void QCPLayerable::mouseMoveEvent(QMouseEvent *event, const QPointF &startPos)
 {
   Q_UNUSED(startPos)
-  event->ignore();
+    event->ignore();
+}
+
+void QCPLayerable::mouseMoveEvent(const QPoint &pos, const QPointF &startPos)
+{
+  Q_UNUSED(pos)
+  Q_UNUSED(startPos)
 }
 
 /*!
@@ -819,7 +832,13 @@ void QCPLayerable::mouseMoveEvent(QMouseEvent *event, const QPointF &startPos)
 void QCPLayerable::mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos)
 {
   Q_UNUSED(startPos)
-  event->ignore();
+    event->ignore();
+}
+
+void QCPLayerable::mouseReleaseEvent(const QPoint &pos, const QPointF &startPos)
+{
+  Q_UNUSED(pos)
+  Q_UNUSED(startPos)
 }
 
 /*!
@@ -873,18 +892,5 @@ void QCPLayerable::mouseDoubleClickEvent(QMouseEvent *event, const QVariant &det
 */
 void QCPLayerable::wheelEvent(QWheelEvent *event)
 {
-    event->ignore();
-}
-
-void QCPLayerable::touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details)
-{
-    Q_UNUSED(details)
-    Q_UNUSED(pos)
-    event->ignore();
-}
-
-void QCPLayerable::touchReleaseEvent(const QPoint &pos, const QPointF &startPos)
-{
-    Q_UNUSED(pos)
-    Q_UNUSED(startPos)
+  event->ignore();
 }

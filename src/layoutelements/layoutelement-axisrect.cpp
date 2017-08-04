@@ -1177,6 +1177,31 @@ void QCPAxisRect::mousePressEvent(QMouseEvent *event, const QVariant &details)
   }
 }
 
+void QCPAxisRect::mousePressEvent(bool &event, const QPoint &pos, const QVariant &details)
+{
+  Q_UNUSED(event)
+  Q_UNUSED(details)
+  mDragStart = pos; // need this even when not LeftButton is pressed, to determine in releaseEvent whether it was a full click (no position change between press and release)
+
+  mDragging = true;
+  // initialize antialiasing backup in case we start dragging:
+  if (mParentPlot->noAntialiasingOnDrag())
+  {
+    mAADragBackup = mParentPlot->antialiasedElements();
+    mNotAADragBackup = mParentPlot->notAntialiasedElements();
+  }
+  // Mouse range dragging interaction:
+  if (mParentPlot->interactions().testFlag(QCP::iRangeDrag))
+  {
+    mDragStartHorzRange.clear();
+    for (int i=0; i<mRangeDragHorzAxis.size(); ++i)
+      mDragStartHorzRange.append(mRangeDragHorzAxis.at(i).isNull() ? QCPRange() : mRangeDragHorzAxis.at(i)->range());
+    mDragStartVertRange.clear();
+    for (int i=0; i<mRangeDragVertAxis.size(); ++i)
+      mDragStartVertRange.append(mRangeDragVertAxis.at(i).isNull() ? QCPRange() : mRangeDragVertAxis.at(i)->range());
+  }
+}
+
 /*! \internal
   
   Event handler for when the mouse is moved on the axis rect. If range dragging was activated in a
@@ -1243,6 +1268,65 @@ void QCPAxisRect::mouseMoveEvent(QMouseEvent *event, const QPointF &startPos)
   }
 }
 
+void QCPAxisRect::mouseMoveEvent(const QPoint &pos, const QPointF &startPos)
+{
+  Q_UNUSED(startPos)
+  // Mouse range dragging interaction:
+  if (mDragging && mParentPlot->interactions().testFlag(QCP::iRangeDrag))
+  {
+
+    if (mRangeDrag.testFlag(Qt::Horizontal))
+    {
+      for (int i=0; i<mRangeDragHorzAxis.size(); ++i)
+      {
+        QCPAxis *ax = mRangeDragHorzAxis.at(i).data();
+        if (!ax)
+          continue;
+        if (i >= mDragStartHorzRange.size())
+          break;
+        if (ax->mScaleType == QCPAxis::stLinear)
+        {
+          double diff = ax->pixelToCoord(mDragStart.x()) - ax->pixelToCoord(pos.x());
+          ax->setRange(mDragStartHorzRange.at(i).lower+diff, mDragStartHorzRange.at(i).upper+diff);
+        } else if (ax->mScaleType == QCPAxis::stLogarithmic)
+        {
+          double diff = ax->pixelToCoord(mDragStart.x()) / ax->pixelToCoord(pos.x());
+          ax->setRange(mDragStartHorzRange.at(i).lower*diff, mDragStartHorzRange.at(i).upper*diff);
+        }
+      }
+    }
+
+    if (mRangeDrag.testFlag(Qt::Vertical))
+    {
+      for (int i=0; i<mRangeDragVertAxis.size(); ++i)
+      {
+        QCPAxis *ax = mRangeDragVertAxis.at(i).data();
+        if (!ax)
+          continue;
+        if (i >= mDragStartVertRange.size())
+          break;
+        if (ax->mScaleType == QCPAxis::stLinear)
+        {
+          double diff = ax->pixelToCoord(mDragStart.y()) - ax->pixelToCoord(pos.y());
+          ax->setRange(mDragStartVertRange.at(i).lower+diff, mDragStartVertRange.at(i).upper+diff);
+        } else if (ax->mScaleType == QCPAxis::stLogarithmic)
+        {
+          double diff = ax->pixelToCoord(mDragStart.y()) / ax->pixelToCoord(pos.y());
+          ax->setRange(mDragStartVertRange.at(i).lower*diff, mDragStartVertRange.at(i).upper*diff);
+        }
+      }
+    }
+
+    if (mRangeDrag != 0) // if either vertical or horizontal drag was enabled, do a replot
+    {
+      if (mParentPlot->noAntialiasingOnDrag())
+        mParentPlot->setNotAntialiasedElements(QCP::aeAll);
+      mParentPlot->replot();
+    }
+
+  }
+}
+
 /* inherits documentation from base class */
 void QCPAxisRect::mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos)
 {
@@ -1254,6 +1338,18 @@ void QCPAxisRect::mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos)
     mParentPlot->setAntialiasedElements(mAADragBackup);
     mParentPlot->setNotAntialiasedElements(mNotAADragBackup);
   }
+}
+
+void QCPAxisRect::mouseReleaseEvent(const QPoint &pos, const QPointF &startPos)
+{
+    Q_UNUSED(pos)
+    Q_UNUSED(startPos)
+    mDragging = false;
+    if (mParentPlot->noAntialiasingOnDrag())
+    {
+      mParentPlot->setAntialiasedElements(mAADragBackup);
+      mParentPlot->setNotAntialiasedElements(mNotAADragBackup);
+    }
 }
 
 /*! \internal
@@ -1301,52 +1397,3 @@ void QCPAxisRect::wheelEvent(QWheelEvent *event)
     }
   }
 }
-
-void QCPAxisRect::touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details)
-{
-    Q_UNUSED(event)
-    Q_UNUSED(details)
-    mTouchDragStart = pos; // need this even when not LeftButton is pressed, to determine in releaseEvent whether it was a full click (no position change between press and release)
-//    if (event->buttons() & Qt::LeftButton)
-//    {
-      mDragging = true;
-      // initialize antialiasing backup in case we start dragging:
-      if (mParentPlot->noAntialiasingOnDrag())
-      {
-        mAADragBackup = mParentPlot->antialiasedElements();
-        mNotAADragBackup = mParentPlot->notAntialiasedElements();
-      }
-      // Mouse range dragging interaction:
-      if (mParentPlot->interactions().testFlag(QCP::iRangeDrag))
-      {
-        mDragStartHorzRange.clear();
-        for (int i=0; i<mRangeDragHorzAxis.size(); ++i)
-          mDragStartHorzRange.append(mRangeDragHorzAxis.at(i).isNull() ? QCPRange() : mRangeDragHorzAxis.at(i)->range());
-        mDragStartVertRange.clear();
-        for (int i=0; i<mRangeDragVertAxis.size(); ++i)
-          mDragStartVertRange.append(mRangeDragVertAxis.at(i).isNull() ? QCPRange() : mRangeDragVertAxis.at(i)->range());
-      }
-      //    }
-}
-
-void QCPAxisRect::touchReleaseEvent(const QPoint &pos, const QPointF &startPos)
-{
-    Q_UNUSED(pos)
-    Q_UNUSED(startPos)
-    mDragging = false;
-    if (mParentPlot->noAntialiasingOnDrag())
-    {
-      mParentPlot->setAntialiasedElements(mAADragBackup);
-      mParentPlot->setNotAntialiasedElements(mNotAADragBackup);
-    }
-}
-
-
-
-
-
-
-
-
-
-

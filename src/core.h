@@ -30,7 +30,6 @@
 #include "axis/range.h"
 #include "axis/axis.h"
 #include "paintbuffer.h"
-#include "customevent.h"
 
 class QCPPainter;
 class QCPLayer;
@@ -202,23 +201,24 @@ public:
 signals:
   void mouseDoubleClick(QMouseEvent *event);
   void mousePress(QMouseEvent *event);
+  void mousePress(const QPoint &pos);
   void mouseMove(QMouseEvent *event);
+  void mouseMove(const QPoint &pos);
   void mouseRelease(QMouseEvent *event);
+  void mouseRelease(const QPoint &pos);
   void mouseWheel(QWheelEvent *event);
-  void touchPress(const QPoint &pos);
-  void touchRelease(const QPoint &pos);
   
   void plottableClick(QCPAbstractPlottable *plottable, int dataIndex, QMouseEvent *event);
-  void plottableTouch(QCPAbstractPlottable *plottable, int dataIndex, const QPoint &pos);
+  void plottableClick(QCPAbstractPlottable *plottable, int dataIndex, const QPoint &pos);
   void plottableDoubleClick(QCPAbstractPlottable *plottable, int dataIndex, QMouseEvent *event);
   void itemClick(QCPAbstractItem *item, QMouseEvent *event);
-  void itemTouch(QCPAbstractItem *item, const QPoint &pos);
+  void itemClick(QCPAbstractItem *item, const QPoint &pos);
   void itemDoubleClick(QCPAbstractItem *item, QMouseEvent *event);
   void axisClick(QCPAxis *axis, QCPAxis::SelectablePart part, QMouseEvent *event);
-  void axisTouch(QCPAxis *axis, QCPAxis::SelectablePart part, const QPoint &pos);
+  void axisClick(QCPAxis *axis, QCPAxis::SelectablePart part, const QPoint &pos);
   void axisDoubleClick(QCPAxis *axis, QCPAxis::SelectablePart part, QMouseEvent *event);
   void legendClick(QCPLegend *legend, QCPAbstractLegendItem *item, QMouseEvent *event);
-  void legendTouch(QCPLegend *legend, QCPAbstractLegendItem *item, const QPoint &pos);
+  void legendClick(QCPLegend *legend, QCPAbstractLegendItem *item, const QPoint &pos);
   void legendDoubleClick(QCPLegend *legend,  QCPAbstractLegendItem *item, QMouseEvent *event);
   
   void selectionChangedByUser();
@@ -256,13 +256,9 @@ protected:
   // non-property members:
   QList<QSharedPointer<QCPAbstractPaintBuffer> > mPaintBuffers;
   QPoint mMousePressPos;
-  QPoint mTouchPressPos;
   bool mMouseHasMoved;
-  bool mTouchHasMoved;
   QPointer<QCPLayerable> mMouseEventLayerable;
-  QPointer<QCPLayerable> mTouchEventLayerable;
   QVariant mMouseEventLayerableDetails;
-  QVariant mTouchEventLayerableDetails;
   bool mReplotting;
   bool mReplotQueued;
   int mOpenGlMultisamples;
@@ -285,6 +281,7 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
   virtual void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
   Q_INVOKABLE virtual void touchPressEvent(const QPoint &pos);
+  Q_INVOKABLE virtual void touchMoveEvent(const QPoint &pos);
   Q_INVOKABLE virtual void touchReleaseEvent(const QPoint &pos);
   
   // introduced virtual methods:

@@ -190,6 +190,13 @@ void QCPSelectionRect::startSelection(QMouseEvent *event)
   emit started(event);
 }
 
+void QCPSelectionRect::startSelection(const QPoint &pos)
+{
+    mActive = true;
+    mRect = QRect(pos, pos);
+    emit started(pos);
+}
+
 /*! \internal
   
   This method is called by QCustomPlot to indicate that an ongoing selection rect interaction needs
@@ -201,6 +208,13 @@ void QCPSelectionRect::moveSelection(QMouseEvent *event)
   mRect.setBottomRight(event->pos());
   emit changed(mRect, event);
   layer()->replot();
+}
+
+void QCPSelectionRect::moveSelection(const QPoint &pos)
+{
+    mRect.setBottomRight(pos);
+    emit changed(mRect, pos);
+    layer()->replot();
 }
 
 /*! \internal
@@ -236,13 +250,6 @@ void QCPSelectionRect::keyPressEvent(QKeyEvent *event)
     mActive = false;
     emit canceled(mRect, event);
   }
-}
-
-void QCPSelectionRect::startSelection(const QPoint &pos)
-{
-    mActive = true;
-    mRect = QRect(pos, pos);
-    emit started(pos);
 }
 
 /* inherits documentation from base class */

@@ -128,11 +128,12 @@ protected:
   virtual void applyDefaultAntialiasingHint(QCPPainter *painter) const Q_DECL_OVERRIDE;
   // events:
   virtual void mousePressEvent(QMouseEvent *event, const QVariant &details) Q_DECL_OVERRIDE;
+  virtual void mousePressEvent(bool &event, const QPoint &pos, const QVariant &details) Q_DECL_OVERRIDE;
   virtual void mouseMoveEvent(QMouseEvent *event, const QPointF &startPos) Q_DECL_OVERRIDE;
+  virtual void mouseMoveEvent(const QPoint &pos, const QPointF &startPos) Q_DECL_OVERRIDE;
   virtual void mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos) Q_DECL_OVERRIDE;
+  virtual void mouseReleaseEvent(const QPoint &pos, const QPointF &startPos) Q_DECL_OVERRIDE;
   virtual void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
-  virtual void touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details) Q_DECL_OVERRIDE;
-  virtual void touchReleaseEvent(const QPoint &pos, const QPointF &startPos) Q_DECL_OVERRIDE;
   
 private:
   Q_DISABLE_COPY(QCPColorScale)

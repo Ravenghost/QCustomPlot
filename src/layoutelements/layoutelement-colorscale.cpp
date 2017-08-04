@@ -485,6 +485,16 @@ void QCPColorScale::mousePressEvent(QMouseEvent *event, const QVariant &details)
   mAxisRect.data()->mousePressEvent(event, details);
 }
 
+void QCPColorScale::mousePressEvent(bool &event, const QPoint &pos, const QVariant &details)
+{
+  if (!mAxisRect)
+  {
+    qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
+    return;
+  }
+  mAxisRect.data()->mousePressEvent(event, pos, details);
+}
+
 /* inherits documentation from base class */
 void QCPColorScale::mouseMoveEvent(QMouseEvent *event, const QPointF &startPos)
 {
@@ -494,6 +504,16 @@ void QCPColorScale::mouseMoveEvent(QMouseEvent *event, const QPointF &startPos)
     return;
   }
   mAxisRect.data()->mouseMoveEvent(event, startPos);
+}
+
+void QCPColorScale::mouseMoveEvent(const QPoint &pos, const QPointF &startPos)
+{
+  if (!mAxisRect)
+  {
+    qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
+    return;
+  }
+  mAxisRect.data()->mouseMoveEvent(pos, startPos);
 }
 
 /* inherits documentation from base class */
@@ -507,6 +527,16 @@ void QCPColorScale::mouseReleaseEvent(QMouseEvent *event, const QPointF &startPo
   mAxisRect.data()->mouseReleaseEvent(event, startPos);
 }
 
+void QCPColorScale::mouseReleaseEvent(const QPoint &pos, const QPointF &startPos)
+{
+  if (!mAxisRect)
+  {
+    qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
+    return;
+  }
+  mAxisRect.data()->mouseReleaseEvent(pos, startPos);
+}
+
 /* inherits documentation from base class */
 void QCPColorScale::wheelEvent(QWheelEvent *event)
 {
@@ -516,26 +546,6 @@ void QCPColorScale::wheelEvent(QWheelEvent *event)
     return;
   }
   mAxisRect.data()->wheelEvent(event);
-}
-
-void QCPColorScale::touchPressEvent(QCPTouchEvent *event, const QPoint &pos, const QVariant &details)
-{
-    if (!mAxisRect)
-    {
-      qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
-      return;
-    }
-    mAxisRect.data()->touchPressEvent(event, pos, details);
-}
-
-void QCPColorScale::touchReleaseEvent(const QPoint &pos, const QPointF &startPos)
-{
-    if (!mAxisRect)
-    {
-      qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
-      return;
-    }
-    mAxisRect.data()->touchReleaseEvent(pos, startPos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
