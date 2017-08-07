@@ -2526,6 +2526,22 @@ void QCustomPlot::touchReleaseEvent(const QPoint &pos)
     replot(rpQueuedReplot);
 }
 
+void QCustomPlot::touchScaleEvent(qreal scale, const QPoint &center, qreal angle)
+{
+  bool event;
+
+  emit mouseWheel(scale, center, angle);
+  // forward event to layerable under cursor:
+  QList<QCPLayerable*> candidates = layerableListAt(center, false);
+  for (int i=0; i<candidates.size(); ++i)
+  {
+    event = true; // default impl of QCPLayerable's mouse events ignore the event, in that case propagate to next candidate in list
+    candidates.at(i)->wheelEvent(event, scale, center, angle);
+    if (event)
+      break;
+  }
+}
+
 /*! \internal
   
   This function draws the entire plot, including background pixmap, with the specified \a painter.

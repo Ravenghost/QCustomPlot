@@ -166,6 +166,7 @@ protected:
   virtual void mouseReleaseEvent(const QPoint &pos, const QPointF &startPos);
   virtual void mouseDoubleClickEvent(QMouseEvent *event, const QVariant &details);
   virtual void wheelEvent(QWheelEvent *event);
+  virtual void wheelEvent(bool &event, qreal scale, const QPoint &center, qreal angle);
   
   // non-property methods:
   void initializeParentPlot(QCustomPlot *parentPlot);

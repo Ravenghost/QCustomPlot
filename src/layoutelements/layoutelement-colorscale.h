@@ -134,6 +134,7 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos) Q_DECL_OVERRIDE;
   virtual void mouseReleaseEvent(const QPoint &pos, const QPointF &startPos) Q_DECL_OVERRIDE;
   virtual void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+  virtual void wheelEvent(bool &event, qreal scale, const QPoint &center, qreal angle) Q_DECL_OVERRIDE;
   
 private:
   Q_DISABLE_COPY(QCPColorScale)

@@ -1397,3 +1397,37 @@ void QCPAxisRect::wheelEvent(QWheelEvent *event)
     }
   }
 }
+
+void QCPAxisRect::wheelEvent(bool &event, qreal scale, const QPoint &center, qreal angle)
+{
+  Q_UNUSED(event)
+  Q_UNUSED(angle)
+  // Mouse range zooming interaction:
+  if (mParentPlot->interactions().testFlag(QCP::iRangeZoom))
+  {
+    if (mRangeZoom != 0)
+    {
+      double factor;
+      double wheelSteps = scale * 10; // a single step delta is +/-120 usually
+      if (mRangeZoom.testFlag(Qt::Horizontal))
+      {
+        factor = qPow(mRangeZoomFactorHorz, wheelSteps);
+        for (int i=0; i<mRangeZoomHorzAxis.size(); ++i)
+        {
+          if (!mRangeZoomHorzAxis.at(i).isNull())
+            mRangeZoomHorzAxis.at(i)->scaleRange(factor, mRangeZoomHorzAxis.at(i)->pixelToCoord(center.x()));
+        }
+      }
+      if (mRangeZoom.testFlag(Qt::Vertical))
+      {
+        factor = qPow(mRangeZoomFactorVert, wheelSteps);
+        for (int i=0; i<mRangeZoomVertAxis.size(); ++i)
+        {
+          if (!mRangeZoomVertAxis.at(i).isNull())
+            mRangeZoomVertAxis.at(i)->scaleRange(factor, mRangeZoomVertAxis.at(i)->pixelToCoord(center.y()));
+        }
+      }
+      mParentPlot->replot();
+    }
+  }
+}

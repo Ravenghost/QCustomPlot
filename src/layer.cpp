@@ -894,3 +894,11 @@ void QCPLayerable::wheelEvent(QWheelEvent *event)
 {
   event->ignore();
 }
+
+void QCPLayerable::wheelEvent(bool &event, qreal scale, const QPoint &center, qreal angle)
+{
+  Q_UNUSED(scale)
+  Q_UNUSED(center)
+  Q_UNUSED(angle)
+  event = false;
+}

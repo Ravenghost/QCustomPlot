@@ -207,6 +207,7 @@ signals:
   void mouseRelease(QMouseEvent *event);
   void mouseRelease(const QPoint &pos);
   void mouseWheel(QWheelEvent *event);
+  void mouseWheel(qreal scale, const QPoint &center, qreal angle);
   
   void plottableClick(QCPAbstractPlottable *plottable, int dataIndex, QMouseEvent *event);
   void plottableClick(QCPAbstractPlottable *plottable, int dataIndex, const QPoint &pos);
@@ -283,6 +284,7 @@ protected:
   Q_INVOKABLE virtual void touchPressEvent(const QPoint &pos);
   Q_INVOKABLE virtual void touchMoveEvent(const QPoint &pos);
   Q_INVOKABLE virtual void touchReleaseEvent(const QPoint &pos);
+  Q_INVOKABLE virtual void touchScaleEvent(qreal scale, const QPoint &center, qreal angle);
   
   // introduced virtual methods:
   virtual void draw(QCPPainter *painter);

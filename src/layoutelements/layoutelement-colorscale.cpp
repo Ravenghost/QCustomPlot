@@ -548,6 +548,16 @@ void QCPColorScale::wheelEvent(QWheelEvent *event)
   mAxisRect.data()->wheelEvent(event);
 }
 
+void QCPColorScale::wheelEvent(bool &event, qreal scale, const QPoint &center, qreal angle)
+{
+  if (!mAxisRect)
+  {
+    qDebug() << Q_FUNC_INFO << "internal axis rect was deleted";
+    return;
+  }
+  mAxisRect.data()->wheelEvent(event, scale, center, angle);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPColorScaleAxisRectPrivate
 ////////////////////////////////////////////////////////////////////////////////////////////////////
