@@ -63,10 +63,10 @@
 #include <QtCore/QStack>
 #include <QtCore/QCache>
 #include <QtCore/QMargins>
+#include <QtQuick/QQuickPaintedItem>
 #include <qmath.h>
 #include <limits>
 #include <algorithm>
-#include <QtQuick/QQuickPaintedItem>
 #ifdef QCP_OPENGL_FBO
 #  include <QtGui/QOpenGLContext>
 #  include <QtGui/QOpenGLFramebufferObject>
@@ -81,12 +81,10 @@
 #endif
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #  include <qnumeric.h>
-#  include <QtGui/QWidget>
 #  include <QtGui/QPrinter>
 #  include <QtGui/QPrintEngine>
 #else
 #  include <QtNumeric>
-#  include <QtWidgets/QWidget>
 #  include <QtPrintSupport/QtPrintSupport>
 #endif
 // amalgamation: include end
