@@ -58,6 +58,7 @@ public:
                      ,tsCrosshair  ///< A plus shaped crosshair which spans the complete axis rect
                      ,tsCircle     ///< A circle
                      ,tsSquare     ///< A square
+                     ,tsLine       ///< A line which spans the axis rect horizontaly
                    };
   Q_ENUMS(TracerStyle)
 

@@ -261,6 +261,10 @@ double QCPItemTracer::selectTest(const QPointF &pos, bool onlySelectable, QVaria
       }
       break;
     }
+    case tsLine:
+    {
+      return qSqrt(QCPVector2D(pos).distanceSquaredToLine(QCPVector2D(center.x(), clip.top()), QCPVector2D(center.x(), clip.bottom())));
+    }
   }
   return -1;
 }
@@ -307,6 +311,12 @@ void QCPItemTracer::draw(QCPPainter *painter)
     {
       if (clip.intersects(QRectF(center-QPointF(w, w), center+QPointF(w, w)).toRect()))
         painter->drawRect(QRectF(center-QPointF(w, w), center+QPointF(w, w)));
+      break;
+    }
+    case tsLine:
+    {
+      if (center.x() > clip.left() && center.x() < clip.right())
+        painter->drawLine(QLineF(center.x(), clip.top(), center.x(), clip.bottom()));
       break;
     }
   }
